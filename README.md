@@ -1,5 +1,12 @@
 # NaCl-MSC
 
+Źródło: 
+
+https://web.archive.org/web/20120305223904/https://www.immport.net/immportWeb/queryref/geneListDetail.do?fileName=Ag_Process&fileType=geneOntology&title=Antigen%20Processing%20and%20Presentation&displayType=1
+
+https://en.wikipedia.org/wiki/Dendritic_cell
+
+https://pl.wikipedia.org/wiki/Chemokiny
 
 Lista genów:
 

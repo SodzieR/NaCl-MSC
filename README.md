@@ -3,8 +3,10 @@
 
 Lista genów:
 
-  charakterystyczne dla komórek dendrytycznych:
   
+  
+      charakterystyczne dla komórek dendrytycznych:
+        
         IL12,IL6,TNF,TLR2,TLR4,TLR7,TLR9
       
       interferony:

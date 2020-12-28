@@ -24,7 +24,7 @@ Lista genów:
       
         CCL(s),CXCL(s),XCL(s),CX3C(s)
         
-    charakterystyczne dla prezentacji antygenu:
+      charakterystyczne dla prezentacji antygenu:
                                                                          'AZGP1',
                                                                          'B2M',
                                                                          'CALR',

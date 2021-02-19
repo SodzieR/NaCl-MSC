@@ -1,18 +1,14 @@
 
 # Dependencies ------------------------------------------------------------
 library(tidyverse)
-library(readxl)
 library(ComplexHeatmap)
-library(biomaRt)
-
 
 # Setup -------------------------------------------------------------------
 setwd('D:/!ZMRiI/!MSC_PAPER')
 
 data <- read.delim('all_data_normalized_TPM.txt', header = TRUE) %>% 
   dplyr::select(id,MICE1,MICE2,MICE3,MICE4,MICE5,MICE6,MICE7,MICE8,MICE9,MICE10,
-         MICE11,MICE12,MICE13,MICE14,MICE15) %>% 
-  column_to_rownames(var = 'id')
+         MICE11,MICE12,MICE13,MICE14,MICE15)
 
 metadata <- data.frame(sample=c('MICE1','MICE2','MICE3','MICE4','MICE5',
                                 'MICE6','MICE7','MICE8','MICE9','MICE10',
@@ -20,6 +16,21 @@ metadata <- data.frame(sample=c('MICE1','MICE2','MICE3','MICE4','MICE5',
                        group = c(1,1,1,1,1,
                                  2,2,2,2,2,
                                  3,3,3,3,3))
+
+data_names <- AnnotationDbi::select(org.Mm.eg.db::org.Mm.eg.db,
+                                    key=data$id, 
+                                    columns="SYMBOL",
+                                    keytype="ENSEMBL") %>% 
+  dplyr::rename('id' = ENSEMBL,
+                'symbol' = SYMBOL) %>%
+  full_join(data) 
+
+data <- data_names %>% 
+  filter(symbol %in% wszystkie_geny) %>% # wszystkie_geny is from Venn Plots.R
+  arrange(symbol) %>% 
+  distinct(symbol, .keep_all = TRUE) %>% 
+  column_to_rownames(var = 'symbol') %>% 
+  select(-c(id))
 
 # Load --------------------------------------------------------------------
 
@@ -60,25 +71,26 @@ col_fun1 = circlize::colorRamp2(c(min(TPM_heatmap_in_log2_scaled), 0, max(TPM_he
 col_fun2 = circlize::colorRamp2(c(-1.5, 0, 1.5),
                              c('blue','white','red'))
 
-ann <- data.frame(metadata$group)
-colnames(ann) <- c('group')
-colours <- list('group' = c('1' = 'red', 
-                            '2' = 'green',
-                            '3' = 'blue'))
+#ann <- data.frame(metadata$group)
+#colnames(ann) <- c('group')
+#colours <- list('group' = c('1' = 'red', 
+#                           '2' = 'green',
+#                            '3' = 'blue'))
 
-colAnn <- HeatmapAnnotation(df = ann,
-                            which = 'col',
-                            col = colours,
-                            annotation_width = unit(c(1, 4), 'cm'),
-                            gap = unit(1, 'mm'))
+#colAnn <- HeatmapAnnotation(df = ann,
+#                            which = 'col',
+#                            col = colours,
+#                            annotation_width = unit(c(1, 4), 'cm'),
+#                            gap = unit(1, 'mm'))
 
 temp2 <- Heatmap(TPM_heatmap_in_log2_scaled, name = 'expression', col = col_fun2,
-        cluster_rows = F, cluster_columns = FALSE, show_row_names = F,
-        border = F, show_column_names = TRUE,column_title = 'Z-scored log2(TPM)', 
+        cluster_rows = T, cluster_columns = FALSE, show_row_names = F,
+        border = F, show_column_names = TRUE,column_title = 'Z-scored log2(TPM)',
         #top_annotation=colAnn,
-        row_dend_width = unit(0, 'cm'))
+        row_dend_width = unit(3, 'cm')
+        )
 
-pdf("5_bwr_Defauult-clustering_z-scored_log2TPM_3x4.pdf", width=2, height=3)
+pdf("XDDDD5_bwr_Defauult-clustering_z-scored_log2TPM_3x4.pdf", width=2, height=3)
 draw(temp2, heatmap_legend_side="left")
 dev.off()
 #
@@ -95,31 +107,31 @@ gplots::heatmap.2(x=TPM_heatmap_in_log2_scaled,
 
 
 # Annotations -------------------------------------------------------------
-ensembl = useMart("ENSEMBL_MART_ENSEMBL")
-ensembl2 = useDataset("mmusculus_gene_ensembl", mart=ensembl)
+#ensembl = useMart("ENSEMBL_MART_ENSEMBL")
+#ensembl2 = useDataset("mmusculus_gene_ensembl", mart=ensembl)
 
 # Set the filter type and values
-filterType <- "ensembl_gene_id"
-filterValues <- rownames(data)[1:10]
+#filterType <- "ensembl_gene_id"
+#filterValues <- rownames(data)[1:10]
 # check the available "attributes" - things you can retreive
-listAttributes(ensembl2) %>% 
-  head(20)
+#listAttributes(ensembl2) %>% 
+#  head(20)
 # Set the list of attributes
-attributeNames <- c("ensembl_gene_id", "external_gene_name", 'description',)
+#attributeNames <- c("ensembl_gene_id", "external_gene_name", 'description',)
 # run the query
-annot <- getBM(attributes=attributeNames, 
-               filters = filterType, 
-               values = filterValues, 
-               mart = ensembl2)
+#annot <- getBM(attributes=attributeNames, 
+#               filters = filterType, 
+#               values = filterValues, 
+#               mart = ensembl2)
 
 
 
 
 
 # GO annotations ----------------------------------------------------------
-library(mygenes)
+#library(mygenes)
 
-genes_to_GO <- queryMany(rownames(data)[1:100], scopes='ensembl.gene', fields=c('symbol', 'go'), species='mouse')
+#genes_to_GO <- queryMany(rownames(data)[1:100], scopes='ensembl.gene', fields=c('symbol', 'go'), species='mouse')
 
 
 
